@@ -120,13 +120,7 @@ resource "azurerm_application_gateway" "agw" {
 }
 
 
-
-
-
-
-
-
-
+#####AKS CLuster creation ########
 
 
 resource "azurerm_kubernetes_cluster" "kubernetes_aks2" {
