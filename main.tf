@@ -7,16 +7,8 @@ data "azurerm_resource_group" "testrse" {
   name = var.resource_group_name
 }
 
-#variable "client_id" {
-#  description = "Service Principal Client ID for AKS"
-#  type        = string
-#}
-#
-#variable "client_secret" {
-#  description = "Service Principal Client Secret for AKS"
-#  type        = string
-#  sensitive   = true
-#}
+
+#### create Virual Network #####
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "my-aks-vnet"
@@ -25,12 +17,18 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = data.azurerm_resource_group.testrse.name
 }
 
+
+#### create AKS network's subnet #####
+
+
 resource "azurerm_subnet" "aks_subnet" {
   name                 = "aks-subnet"
   resource_group_name  = data.azurerm_resource_group.testrse.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.1.0/24"]
 }
+
+#### create application gateway network's subnet #####
 
 resource "azurerm_subnet" "agw_subnet" {
   name                 = "agw-subnet"
@@ -39,7 +37,7 @@ resource "azurerm_subnet" "agw_subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-
+#### create application gateway public IP #####
 
 resource "azurerm_public_ip" "agw_public_ip" {
   name                = "my-agw-public-ip"
@@ -50,20 +48,11 @@ resource "azurerm_public_ip" "agw_public_ip" {
   sku                 = "Standard"
 }
 
-locals {
-  backend_address_pool_name      = "${azurerm_virtual_network.vnet.name}-beap"
-  frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
-  frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
-  http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
-  listener_name                  = "${azurerm_virtual_network.vnet.name}-httplstn"
-  request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
-  redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
-}
 
+#### create application gateway #######
 
 resource "azurerm_application_gateway" "agw" {
   name                = "my-application-gateway"
-#  location            = azurerm_kubernetes_cluster.kubernetes_aks2.location
   location            = "East US"
   resource_group_name = data.azurerm_resource_group.testrse.name
 
@@ -117,6 +106,18 @@ resource "azurerm_application_gateway" "agw" {
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
   }
+}
+
+### USE LOCAL to REUSE the EXPRESSION ###
+
+locals {
+  backend_address_pool_name      = "${azurerm_virtual_network.vnet.name}-beap"
+  frontend_port_name             = "${azurerm_virtual_network.vnet.name}-feport"
+  frontend_ip_configuration_name = "${azurerm_virtual_network.vnet.name}-feip"
+  http_setting_name              = "${azurerm_virtual_network.vnet.name}-be-htst"
+  listener_name                  = "${azurerm_virtual_network.vnet.name}-httplstn"
+  request_routing_rule_name      = "${azurerm_virtual_network.vnet.name}-rqrt"
+  redirect_configuration_name    = "${azurerm_virtual_network.vnet.name}-rdrcfg"
 }
 
 
