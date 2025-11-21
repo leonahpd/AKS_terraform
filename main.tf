@@ -37,7 +37,7 @@ resource "azurerm_subnet" "agw_subnet" {
   address_prefixes     = ["10.0.2.0/24"]
 }
 
-#### create application gateway public IP #####
+#### create public IP for application gateway  #####
 
 resource "azurerm_public_ip" "agw_public_ip" {
   name                = "my-agw-public-ip"
