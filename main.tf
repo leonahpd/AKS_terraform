@@ -28,7 +28,7 @@ resource "azurerm_subnet" "aks_subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
-#### create application gateway network's subnet #####
+#### create subnet  for application gateway  #####
 
 resource "azurerm_subnet" "agw_subnet" {
   name                 = "agw-subnet"
